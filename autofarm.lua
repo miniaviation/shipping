@@ -78,7 +78,7 @@ local function executeButtonSequence()
     clickButton()
     
     -- Step 2: Wait 5 seconds and click CargoManager.Button
-    task.wait(5)
+    task.wait(10)
     local cargoButton1 = playerGui:WaitForChild("PortGui"):WaitForChild("PortMainMenu"):WaitForChild("MenuButtons"):WaitForChild("CargoManager"):WaitForChild("Button")
     if cargoButton1 and cargoButton1:IsA("TextButton") then
         firesignal(cargoButton1.MouseButton1Click)
@@ -113,3 +113,4 @@ initializeButton()
 
 -- Execute the sequence
 executeButtonSequence()
+
