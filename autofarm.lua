@@ -20,11 +20,32 @@ local firesignal = firesignal or function(signal)
     end
 end
 
--- Variable to store the found button
-local currentButton = nil
+-- Variables to store the buttons
+local cargoButton = nil
+local loadButton = nil
 
--- Function to find the TextButton
-local function findButton()
+-- Function to find the CargoManager Button
+local function findCargoButton()
+    local cargoManager = playerGui:FindFirstChild("PortGui") and 
+                         playerGui.PortGui:FindFirstChild("PortMainMenu") and 
+                         playerGui.PortGui.PortMainMenu:FindFirstChild("MenuButtons") and 
+                         playerGui.PortGui.PortMainMenu.MenuButtons:FindFirstChild("CargoManager")
+    
+    if cargoManager then
+        local button = cargoManager:FindFirstChild("Button")
+        if button and button:IsA("TextButton") then
+            return button
+        else
+            warn("No TextButton named 'Button' found in CargoManager")
+        end
+    else
+        warn("CargoManager not found at path: PlayerGui.PortGui.PortMainMenu.MenuButtons.CargoManager")
+    end
+    return nil
+end
+
+-- Function to find the Load Button
+local function findLoadButton()
     local scrollingFrame = playerGui:FindFirstChild("PortGui") and 
                           playerGui.PortGui:FindFirstChild("ContainerMenu") and 
                           playerGui.PortGui.ContainerMenu:FindFirstChild("ScrollingFrame")
@@ -56,27 +77,37 @@ local function findButton()
     return nil
 end
 
--- Function to initialize or refresh the button
-local function initializeButton()
-    if not currentButton or not currentButton.Parent then
-        currentButton = findButton()
-        if currentButton then
-            print("Initialized button: " .. currentButton:GetFullName())
-            print("Current button name: " .. currentButton.Name)
+-- Function to initialize or refresh the buttons
+local function initializeButtons()
+    -- Initialize Cargo Button
+    if not cargoButton or not cargoButton.Parent then
+        cargoButton = findCargoButton()
+        if cargoButton then
+            print("Initialized Cargo Button: " .. cargoButton:GetFullName())
         else
-            warn("No TextButton named 'Load' found in ScrollingFrame!")
+            warn("Failed to initialize Cargo Button!")
+        end
+    end
+    
+    -- Initialize Load Button
+    if not loadButton or not loadButton.Parent then
+        loadButton = findLoadButton()
+        if loadButton then
+            print("Initialized Load Button: " .. loadButton:GetFullName())
+        else
+            warn("Failed to initialize Load Button!")
             -- Debug: List all TextButtons in ScrollingFrame
             local scrollingFrame = playerGui:FindFirstChild("PortGui") and 
                                   playerGui.PortGui.ContainerMenu:FindFirstChild("ScrollingFrame")
             if scrollingFrame then
-                print("Listing children for debugging:")
+                print("Listing ScrollingFrame children for debugging:")
                 for i, child in ipairs(scrollingFrame:GetChildren()) do
                     if child:IsA("TextButton") then
                         print("Child " .. i .. ": TextButton named " .. child.Name)
                     elseif child:IsA("Frame") then
-                        local loadButton = child:FindFirstChild("Load")
-                        if loadButton and loadButton:IsA("TextButton") then
-                            print("Child " .. i .. ": Frame contains TextButton named " .. loadButton.Name)
+                        local loadBtn = child:FindFirstChild("Load")
+                        if loadBtn and loadBtn:IsA("TextButton") then
+                            print("Child " .. i .. ": Frame contains TextButton named " .. loadBtn.Name)
                         end
                     end
                 end
@@ -85,29 +116,43 @@ local function initializeButton()
     end
 end
 
--- Function to fire the click signal
-local function clickButton()
-    if not currentButton then
-        initializeButton()
+-- Function to click both buttons in sequence
+local function clickButtons()
+    initializeButtons()
+    
+    -- Click Cargo Button first
+    if cargoButton and cargoButton:IsA("TextButton") then
+        firesignal(cargoButton.MouseButton1Click)
+        print("Fired MouseButton1Click for " .. cargoButton:GetFullName())
+    else
+        warn("Cargo Button is invalid! Re-initializing...")
+        cargoButton = findCargoButton()
+        if cargoButton then
+            firesignal(cargoButton.MouseButton1Click)
+            print("Fired MouseButton1Click for " .. cargoButton:GetFullName())
+        else
+            warn("Failed to find a valid TextButton at CargoManager.Button!")
+        end
     end
     
-    if currentButton and currentButton:IsA("TextButton") then
-        firesignal(currentButton.MouseButton1Click)
-        print("Fired MouseButton1Click for " .. currentButton:GetFullName())
+    -- Wait briefly to ensure the first click processes
+    wait(0.5)
+    
+    -- Click Load Button second
+    if loadButton and loadButton:IsA("TextButton") then
+        firesignal(loadButton.MouseButton1Click)
+        print("Fired MouseButton1Click for " .. loadButton:GetFullName())
     else
-        warn("Current button is invalid! Re-initializing...")
-        initializeButton()
-        if currentButton then
-            firesignal(currentButton.MouseButton1Click)
-            print("Fired MouseButton1Click for " .. currentButton:GetFullName())
+        warn("Load Button is invalid! Re-initializing...")
+        loadButton = findLoadButton()
+        if loadButton then
+            firesignal(loadButton.MouseButton1Click)
+            print("Fired MouseButton1Click for " .. loadButton:GetFullName())
         else
-            warn("Failed to find a valid TextButton named 'Load' after re-initialization!")
+            warn("Failed to find a valid TextButton named 'Load'!")
         end
     end
 end
 
--- Initial setup
-initializeButton()
-
--- Click the button
-clickButton()
+-- Initial setup and click
+clickButtons()
