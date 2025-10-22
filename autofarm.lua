@@ -1,13 +1,21 @@
--- Get the player and the TextButton
+-- Get the player
 local player = game:GetService("Players").LocalPlayer
-local button = player.PlayerGui.PortGui.PortMainMenu.MenuButtons.CargoManager.Button
+local buttonPath = player.PlayerGui:FindFirstChild("PortGui") and 
+                  player.PlayerGui.PortGui:FindFirstChild("PortMainMenu") and 
+                  player.PlayerGui.PortGui.PortMainMenu:FindFirstChild("MenuButtons") and 
+                  player.PlayerGui.PortGui.PortMainMenu.MenuButtons:FindFirstChild("CargoManager") and 
+                  player.PlayerGui.PortGui.PortMainMenu.MenuButtons.CargoManager:FindFirstChild("Button")
 
--- Check if the button exists and is a TextButton
-if button and button:IsA("TextButton") then
-    -- Simulate a click by firing the MouseButton1Click event
-    button:Activate()
-    -- Alternatively, you can directly trigger the click event
-    button.MouseButton1Click:Fire()
+-- Check if the button exists
+if buttonPath then
+    if buttonPath:IsA("TextButton") then
+        -- Simulate a click
+        buttonPath:Activate() -- Primary method for TextButton
+        buttonPath.MouseButton1Click:Fire() -- Fallback for custom click events
+        print("TextButton clicked successfully")
+    else
+        warn("Found object is not a TextButton")
+    end
 else
-    warn("TextButton not found at the specified path or is not a TextButton")
+    warn("TextButton not found at path: PlayerGui.PortGui.PortMainMenu.MenuButtons.CargoManager.Button")
 end
