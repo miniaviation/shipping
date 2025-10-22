@@ -22,7 +22,7 @@ wait(0.5)
 
 -- Click Load Button
 firesignal(playerGui.PortGui.ContainerMenu.ScrollingFrame:GetChildren()[16].Load.MouseButton1Click)
-wait(0.5)
+wait(5)
 
 -- Click Back Button
 firesignal(playerGui.PortGui.ContainerMenu.Back.MouseButton1Click)
@@ -30,3 +30,4 @@ wait(0.5)
 
 -- Click Undock Button
 firesignal(playerGui.PortGui.PortMainMenu.MenuButtons.Undock.Button.MouseButton1Click)
+
