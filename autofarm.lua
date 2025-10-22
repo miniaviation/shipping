@@ -1,202 +1,79 @@
-local farmnum = 0
-while _G.test do
-    wait()
-    for i, v in pairs(workspace:GetDescendants()) do
-        pcall(function()
-            v.CanCollide = false
-        end)
-    end
-    local check, errors = pcall(function()
-        _G.rat = nil
-        local distance = math.huge
-        for a, b in pairs(game:GetService("Workspace").Ports:GetDescendants()) do
-            if b.Name == "DockingArea" then
-                local Dist = (game.Players.LocalPlayer.CurrentShip.Value.PrimaryPart.Position - b.Position).magnitude
-                if Dist < distance then
-                    distance = Dist
-                    _G.rat = b
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+
+-- Updated firesignal definition
+local firesignal = firesignal or function(signal)
+    if getconnections then
+        local connections = getconnections(signal)
+        if connections then
+            for _, connection in pairs(connections) do
+                if connection and connection.Function then
+                    pcall(connection.Function) -- Safely call the connected function
                 end
             end
+        else
+            warn("No connections found for the signal!")
         end
-        if _G.rat.Parent.Parent.Name ~= "Rockfall Port" then
-            game:GetService("ReplicatedStorage").RemoteStorage.RemoteFunction:InvokeServer("SpawnShip", game.Players.LocalPlayer.CurrentShip.Value, "Rockfall Port")
-            wait(3)
-            game:GetService("Players").LocalPlayer.CurrentShip.Value.ControlPanel.VehicleSeat:Sit(game.Players.LocalPlayer.Character.Humanoid)
-        end
-        repeat wait() until game.Players.LocalPlayer.Character.Humanoid.SeatPart ~= nil or _G.test == false
-        for i, v in pairs(workspace:GetDescendants()) do
-            pcall(function()
-                v.CanCollide = false
-            end)
-        end
-        wait(5)
-        local dist = (game.Players.LocalPlayer.CurrentShip.Value.PrimaryPart.Position - Vector3.new(-6373.4052734375, 230.53976440429688, 1904.3013916015625)).magnitude
-        print(dist / 25 / 7)
-        repeat
-            wait()
-            local ship = game.Players.LocalPlayer.CurrentShip.Value
-            local TweenService = game:GetService("TweenService")
-            local TweenInfoToUse = TweenInfo.new(dist / 25 / 7, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut, 0, false, 0)
-            local TweenValue = Instance.new("CFrameValue")
-            TweenValue.Value = ship:GetPrimaryPartCFrame()
-            TweenValue.Changed:Connect(function()
-                ship:SetPrimaryPartCFrame(TweenValue.Value)
-            end)
-            local OnTween = TweenService:Create(TweenValue, TweenInfoToUse, {Value = CFrame.new(-6373.4052734375, 230.53976440429688, 1904.3013916015625)})
-            OnTween:Play()
-            OnTween.Completed:Wait()
-            wait(1)
-            dist = (game.Players.LocalPlayer.CurrentShip.Value.PrimaryPart.Position - Vector3.new(-6373.4052734375, 230.53976440429688, 1904.3013916015625)).magnitude
-        until dist < 100 or _G.test == false
-
-        dist = (game.Players.LocalPlayer.CurrentShip.Value.PrimaryPart.Position - Vector3.new(-5466.9814453125, 230.81895446777344, 1618.270263671875)).magnitude
-        print(dist / 25 / 7)
-        repeat
-            wait()
-            local ship = game.Players.LocalPlayer.CurrentShip.Value
-            local TweenService = game:GetService("TweenService")
-            local TweenInfoToUse = TweenInfo.new(dist / 25 / 7, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut, 0, false, 0)
-            local TweenValue = Instance.new("CFrameValue")
-            TweenValue.Value = ship:GetPrimaryPartCFrame()
-            TweenValue.Changed:Connect(function()
-                ship:SetPrimaryPartCFrame(TweenValue.Value)
-            end)
-            local OnTween = TweenService:Create(TweenValue, TweenInfoToUse, {Value = CFrame.new(-5466.9814453125, 230.81895446777344, 1618.270263671875)})
-            OnTween:Play()
-            OnTween.Completed:Wait()
-            wait(1)
-            dist = (game.Players.LocalPlayer.CurrentShip.Value.PrimaryPart.Position - Vector3.new(-5466.9814453125, 230.81895446777344, 1618.270263671875)).magnitude
-        until dist < 100 or _G.test == false
-
-        wait(3)
-        firesignal(game:GetService("Players").LocalPlayer.PlayerGui.ShipControlGui.ShipControls.Controls.Dock.MouseButton1Click)
-        repeat wait() until game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild("PortGui") or _G.test == false
-        repeat wait() until game:GetService("Players").LocalPlayer.PlayerGui:WaitForChild("PortGui"):WaitForChild("LoadingBar").Visible == false or _G.test == false
-        firesignal(game:GetService("Players").LocalPlayer.PlayerGui.PortGui.PortMainMenu.MenuButtons.CargoManager.Button.MouseButton1Click)
-        wait()
-        for i, v in pairs(game:GetService("Players").LocalPlayer.PlayerGui.PortGui.ContainerMenu.ScrollingFrame:GetChildren()) do
-            if v.Name == "ListItem" and v.PortName.Text == "Ocean Fall Port" then
-                firesignal(v.Load.MouseButton1Click)
-            end
-        end
-        wait(2)
-        firesignal(game:GetService("Players").LocalPlayer.PlayerGui.PortGui.PortMainMenu.MenuButtons.Undock.Button.MouseButton1Click)
-        repeat wait() until game.Players.LocalPlayer.CurrentShip.Value:GetAttribute("IsDocked") == false or _G.test == false
-        wait()
-        dist = (game.Players.LocalPlayer.CurrentShip.Value.PrimaryPart.Position - Vector3.new(-12308.9697265625, 270.3766784667969, -6376.62451171875)).magnitude
-        print(dist / 25 / 7)
-        repeat
-            wait()
-            local ship = game.Players.LocalPlayer.CurrentShip.Value
-            local TweenService = game:GetService("TweenService")
-            local TweenInfoToUse = TweenInfo.new(dist / 25 / 7, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut, 0, false, 0)
-            local TweenValue = Instance.new("CFrameValue")
-            TweenValue.Value = ship:GetPrimaryPartCFrame()
-            TweenValue.Changed:Connect(function()
-                ship:SetPrimaryPartCFrame(TweenValue.Value)
-            end)
-            local OnTween = TweenService:Create(TweenValue, TweenInfoToUse, {Value = CFrame.new(-12308.9697265625, 270.3766784667969, -6376.62451171875)})
-            OnTween:Play()
-            OnTween.Completed:Wait()
-            wait(1)
-            dist = (game.Players.LocalPlayer.CurrentShip.Value.PrimaryPart.Position - Vector3.new(-12308.9697265625, 270.3766784667969, -6376.62451171875)).magnitude
-        until dist < 100 or _G.test == false
-
-        dist = (game.Players.LocalPlayer.CurrentShip.Value.PrimaryPart.Position - Vector3.new(6537.8779296875, 262.49554443359375, -44690.4296875)).magnitude
-        print(dist / 25 / 7)
-        repeat
-            wait()
-            local ship = game.Players.LocalPlayer.CurrentShip.Value
-            local TweenService = game:GetService("TweenService")
-            local TweenInfoToUse = TweenInfo.new(dist / 25 / 7, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut, 0, false, 0)
-            local TweenValue = Instance.new("CFrameValue")
-            TweenValue.Value = ship:GetPrimaryPartCFrame()
-            TweenValue.Changed:Connect(function()
-                ship:SetPrimaryPartCFrame(TweenValue.Value)
-            end)
-            local OnTween = TweenService:Create(TweenValue, TweenInfoToUse, {Value = CFrame.new(6537.8779296875, 262.49554443359375, -44690.4296875)})
-            OnTween:Play()
-            OnTween.Completed:Wait()
-            wait(1)
-            dist = (game.Players.LocalPlayer.CurrentShip.Value.PrimaryPart.Position - Vector3.new(6537.8779296875, 262.49554443359375, -44690.4296875)).magnitude
-        until dist < 100 or _G.test == false
-
-        dist = (game.Players.LocalPlayer.CurrentShip.Value.PrimaryPart.Position - Vector3.new(16525.6640625, 230.3463134765625, -44779.72265625)).magnitude
-        print(dist / 25 / 7)
-        repeat
-            wait()
-            local ship = game.Players.LocalPlayer.CurrentShip.Value
-            local TweenService = game:GetService("TweenService")
-            local TweenInfoToUse = TweenInfo.new(dist / 25 / 7, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut, 0, false, 0)
-            local TweenValue = Instance.new("CFrameValue")
-            TweenValue.Value = ship:GetPrimaryPartCFrame()
-            TweenValue.Changed:Connect(function()
-                ship:SetPrimaryPartCFrame(TweenValue.Value)
-            end)
-            local OnTween = TweenService:Create(TweenValue, TweenInfoToUse, {Value = CFrame.new(16525.6640625, 230.3463134765625, -44779.72265625)})
-            OnTween:Play()
-            OnTween.Completed:Wait()
-            wait(1)
-            dist = (game.Players.LocalPlayer.CurrentShip.Value.PrimaryPart.Position - Vector3.new(16525.6640625, 230.3463134765625, -44779.72265625)).magnitude
-        until dist < 100 or _G.test == false
-
-        _G.rat = nil
-        local distance = math.huge
-        for a, b in pairs(workspace.Ports["Ocean Fall Port"].CargoLoaders:GetChildren()) do
-            if b.Name == "DockingArea" and b:FindFirstChild("Container") then
-                local Dist = (game.Players.LocalPlayer.CurrentShip.Value.PrimaryPart.Position - b.Position).magnitude
-                if Dist < distance then
-                    distance = Dist
-                    _G.rat = b
-                end
-            end
-        end
-        dist = (game.Players.LocalPlayer.CurrentShip.Value.PrimaryPart.Position - _G.rat.Position).magnitude
-        print(dist)
-        for i, v in pairs(workspace:GetDescendants()) do
-            pcall(function()
-                v.CanCollide = false
-            end)
-        end
-        wait()
-        repeat
-            wait()
-            local ship = game.Players.LocalPlayer.CurrentShip.Value
-            local TweenService = game:GetService("TweenService")
-            local TweenInfoToUse = TweenInfo.new(dist / 22 / 7, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut, 0, false, 0)
-            local TweenValue = Instance.new("CFrameValue")
-            TweenValue.Value = ship:GetPrimaryPartCFrame()
-            TweenValue.Changed:Connect(function()
-                ship:SetPrimaryPartCFrame(TweenValue.Value)
-            end)
-            local OnTween = TweenService:Create(TweenValue, TweenInfoToUse, {Value = CFrame.new(_G.rat.Position)})
-            OnTween:Play()
-            OnTween.Completed:Wait()
-            wait(1)
-            dist = (game.Players.LocalPlayer.CurrentShip.Value.PrimaryPart.Position - _G.rat.Position).magnitude
-        until dist < 100 or _G.test == false
-        repeat
-            wait()
-            local text = game:GetService("Players").LocalPlayer.PlayerGui.ShipControlGui.ShipControls.Controls.Speed.Text:split(" ")
-            local number = tonumber(text[1])
-        until number == 0 or _G.test == false
-        firesignal(game:GetService("Players").LocalPlayer.PlayerGui.ShipControlGui.ShipControls.Controls.Dock.MouseButton1Click)
-        repeat wait() until game:GetService("Players").LocalPlayer.PlayerGui:WaitForChild("PortGui"):WaitForChild("LoadingBar").Visible == false or _G.test == false
-        firesignal(game:GetService("Players").LocalPlayer.PlayerGui.PortGui.PortMainMenu.MenuButtons.CargoManager.Button.MouseButton1Click)
-        wait()
-        firesignal(game:GetService("Players").LocalPlayer.PlayerGui.PortGui.ContainerMenu.SwitchMode.MouseButton1Click)
-        for i, v in pairs(game:GetService("Players").LocalPlayer.PlayerGui.PortGui.ContainerMenu.ScrollingFrame:GetDescendants()) do
-            if v.Name == "Unload" then
-                firesignal(v.MouseButton1Click)
-                wait()
-            end
-        end
-        wait()
-        game.Players.LocalPlayer.CurrentShip.Value.PrimaryPart.Anchored = false
-        farmnum = farmnum + 1
-        warn(farmnum)
-    end)
-    if errors ~= nil then
-        warn(errors)
+    else
+        warn("Executor does not support getconnections/firesignal!")
     end
 end
+
+-- Variable to store the found button
+local currentButton = nil
+
+-- Function to find the TextButton (called once or on refresh)
+local function findButton()
+    local dockingRequest = playerGui:WaitForChild("ShipControlGui"):WaitForChild("Menus"):WaitForChild("DockingRequest")
+    for _, child in pairs(dockingRequest:GetChildren()) do
+        if child:IsA("TextButton") then
+            return child
+        end
+    end
+    return nil
+end
+
+-- Function to initialize or refresh the button
+local function initializeButton()
+    if not currentButton or not currentButton.Parent then
+        currentButton = findButton()
+        if currentButton then
+            print("Initialized button: " .. currentButton:GetFullName())
+            print("Current button name: " .. currentButton.Name)
+        else
+            warn("No TextButton found in DockingRequest!")
+            print("Listing children for debugging:")
+            for _, child in pairs(dockingRequest:GetChildren()) do
+                print("Child: " .. child.Name .. " | Class: " .. child.ClassName)
+            end
+        end
+    end
+end
+
+-- Function to fire the click signal
+local function clickButton()
+    if not currentButton then
+        initializeButton()
+    end
+    
+    if currentButton and currentButton:IsA("TextButton") then
+        firesignal(currentButton.MouseButton1Click)
+        print("Fired MouseButton1Click for " .. currentButton:GetFullName())
+    else
+        warn("Current button is invalid! Re-initializing...")
+        initializeButton()
+        if currentButton then
+            firesignal(currentButton.MouseButton1Click)
+            print("Fired MouseButton1Click for " .. currentButton:GetFullName())
+        else
+            warn("Failed to find a valid TextButton after re-initialization!")
+        end
+    end
+end
+
+-- Initial setup
+initializeButton()
+
+-- Example: Call clickButton whenever you want to fire the signal
+clickButton()
