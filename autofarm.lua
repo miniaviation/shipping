@@ -2,7 +2,7 @@ local Players = game:GetService("Players")
 local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
 
--- Updated firesignal definition (this works!)
+-- Updated firesignal definition
 local firesignal = firesignal or function(signal)
     if getconnections then
         local connections = getconnections(signal)
@@ -20,10 +20,10 @@ local firesignal = firesignal or function(signal)
     end
 end
 
--- Variable to store the found button
-local currentButton = nil
+-- Variable to store the found docking button
+local currentDockingButton = nil
 
--- Function to find the TextButton in DockingRequest (this works!)
+-- Function to find the docking TextButton (called once or on refresh)
 local function findDockingButton()
     local dockingRequest = playerGui:WaitForChild("ShipControlGui"):WaitForChild("Menus"):WaitForChild("DockingRequest")
     for _, child in pairs(dockingRequest:GetChildren()) do
@@ -34,74 +34,87 @@ local function findDockingButton()
     return nil
 end
 
--- Function to find specific buttons by path
-local function findSpecificButton(pathParts)
-    local current = playerGui
-    for _, part in pairs(pathParts) do
-        current = current:WaitForChild(part)
-    end
-    return current
-end
-
 -- Function to initialize or refresh the docking button
-local function initializeButton()
-    if not currentButton or not currentButton.Parent then
-        currentButton = findDockingButton()
-        if currentButton then
-            print("Initialized docking button: " .. currentButton:GetFullName())
-            print("Current button name: " .. currentButton.Name)
+local function initializeDockingButton()
+    if not currentDockingButton or not currentDockingButton.Parent then
+        currentDockingButton = findDockingButton()
+        if currentDockingButton then
+            print("Initialized docking button: " .. currentDockingButton:GetFullName())
+            print("Current docking button name: " .. currentDockingButton.Name)
         else
             warn("No TextButton found in DockingRequest!")
-            return false
+            print("Listing children for debugging:")
+            local dockingRequest = playerGui:WaitForChild("ShipControlGui"):WaitForChild("Menus"):WaitForChild("DockingRequest")
+            for _, child in pairs(dockingRequest:GetChildren()) do
+                print("Child: " .. child.Name .. " | Class: " .. child.ClassName)
+            end
         end
     end
-    return true
 end
 
--- Function to fire any button's click signal
-local function fireButtonClick(button, buttonName)
-    if button and (button:IsA("TextButton") or button:IsA("ImageButton")) then
-        firesignal(button.MouseButton1Click)
-        print("Fired MouseButton1Click for " .. button:GetFullName() .. " (" .. buttonName .. ")")
-        return true
+-- Function to fire the docking button click signal
+local function clickDockingButton()
+    if not currentDockingButton then
+        initializeDockingButton()
+    end
+    
+    if currentDockingButton and currentDockingButton:IsA("TextButton") then
+        firesignal(currentDockingButton.MouseButton1Click)
+        print("Fired MouseButton1Click for docking button: " .. currentDockingButton:GetFullName())
     else
-        warn("Button not found or invalid for " .. buttonName .. "!")
-        return false
+        warn("Docking button is invalid! Re-initializing...")
+        initializeDockingButton()
+        if currentDockingButton then
+            firesignal(currentDockingButton.MouseButton1Click)
+            print("Fired MouseButton1Click for docking button: " .. currentDockingButton:GetFullName())
+        else
+            warn("Failed to find a valid docking TextButton after re-initialization!")
+        end
+    end
+end
+
+-- Function to fire a specific button by path (with error handling)
+local function fireSpecificButton(path)
+    local success, button = pcall(function()
+        local expr = path:gsub("game:GetService%(\"Players\"%).LocalPlayer%.PlayerGui", "playerGui")
+        return loadstring("return " .. expr)()
+    end)
+    if success and button and (button:IsA("TextButton") or button:IsA("ImageButton")) then
+        firesignal(button.MouseButton1Click)
+        print("Fired MouseButton1Click for " .. button:GetFullName())
+    else
+        warn("Failed to find or fire button at path: " .. path)
+        if not success then
+            warn("Error: " .. tostring(button))
+        elseif button then
+            warn("Button class: " .. button.ClassName .. " (not clickable or invalid)")
+        end
     end
 end
 
 -- Main sequence function
 local function executeSequence()
-    print("=== Starting Auto Sequence ===")
-    
-    -- Step 1: Fire docking button (immediate)
-    if initializeButton() then
-        fireButtonClick(currentButton, "Docking Button")
-    else
-        warn("Failed to initialize docking button - sequence aborted!")
-        return
-    end
-    
-    -- Step 2: Wait 5 seconds, then fire CargoManager button
-    wait(5)
-    print("--- 5 seconds passed, firing CargoManager ---")
-    local cargoButton = findSpecificButton({"PortGui", "PortMainMenu", "MenuButtons", "CargoManager", "Button"})
-    fireButtonClick(cargoButton, "CargoManager")
-    
-    -- Step 3: Wait 1 more second, then fire Load button
-    wait(1)
-    print("--- 1 second passed, firing Load ---")
-    local loadButton = findSpecificButton({"PortGui", "BulkMenu", "ScrollingFrame", "ListItem", "Load"})
-    fireButtonClick(loadButton, "Load")
-    
-    -- Step 4: Wait 10 more seconds, then fire CargoManager button again
-    wait(10)
-    print("--- 10 seconds passed, firing CargoManager again ---")
-    local cargoButton2 = findSpecificButton({"PortGui", "PortMainMenu", "MenuButtons", "CargoManager", "Button"})
-    fireButtonClick(cargoButton2, "CargoManager (2nd time)")
-    
-    print("=== Sequence Complete ===")
+    -- Initial setup for docking button
+    initializeDockingButton()
+
+    -- Step 1: Fire docking button immediately
+    clickDockingButton()
+
+    -- Step 2: After 5 seconds, fire CargoManager.Button
+    task.delay(5, function()
+        fireSpecificButton('game:GetService("Players").LocalPlayer.PlayerGui.PortGui.PortMainMenu.MenuButtons.CargoManager.Button')
+    end)
+
+    -- Step 3: After another 1 second (total 6 seconds), fire Load
+    task.delay(6, function()
+        fireSpecificButton('game:GetService("Players").LocalPlayer.PlayerGui.PortGui.BulkMenu.ScrollingFrame.ListItem.Load')
+    end)
+
+    -- Step 4: After another 10 seconds (total 16 seconds), fire CargoManager.Button again
+    task.delay(16, function()
+        fireSpecificButton('game:GetService("Players").LocalPlayer.PlayerGui.PortGui.PortMainMenu.MenuButtons.CargoManager.Button')
+    end)
 end
 
 -- Run the sequence
-executeS
+executeSequence()
