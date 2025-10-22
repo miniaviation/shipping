@@ -1,8 +1,8 @@
 local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local player = Players.LocalPlayer
-local playerGui = player:WaitForChild("PlayerGui")
 
--- Updated firesignal definition (from your script)
+-- Updated firesignal definition
 local firesignal = firesignal or function(signal)
     if getconnections then
         local connections = getconnections(signal)
@@ -25,27 +25,53 @@ local currentButton = nil
 
 -- Function to find the TextButton
 local function findButton()
-    local cargoManager = playerGui:FindFirstChild("PortGui") and 
-                         playerGui.PortGui:FindFirstChild("PortMainMenu") and 
-                         playerGui.PortGui.PortMainMenu:FindFirstChild("MenuButtons") and 
-                         playerGui.PortGui.PortMainMenu.MenuButtons:FindFirstChild("CargoManager")
-    
-    if cargoManager then
-        local button = cargoManager:FindFirstChild("Button")
-        if button and button:IsA("TextButton") then
-            return button
-        else
-            warn("No TextButton named 'Button' found in CargoManager")
-            -- Debug: List all TextButtons in CargoManager
-            print("Listing children of CargoManager for debugging:")
-            for _, child in ipairs(cargoManager:GetChildren()) do
-                if child:IsA("TextButton") then
-                    print("Child: TextButton named " .. child.Name)
+    local globalReplicated = ReplicatedStorage:FindFirstChild("GlobalReplicated")
+    if globalReplicated then
+        local storage = globalReplicated:FindFirstChild("Storage")
+        if storage then
+            local guis = storage:FindFirstChild("Guis")
+            if guis then
+                local portGui = guis:FindFirstChild("PortGui")
+                if portGui then
+                    local portMainMenu = portGui:FindFirstChild("PortMainMenu")
+                    if portMainMenu then
+                        local menuButtons = portMainMenu:FindFirstChild("MenuButtons")
+                        if menuButtons then
+                            local cargoManager = menuButtons:FindFirstChild("CargoManager")
+                            if cargoManager then
+                                local button = cargoManager:FindFirstChild("Button")
+                                if button and button:IsA("TextButton") then
+                                    return button
+                                else
+                                    warn("No TextButton named 'Button' found in CargoManager")
+                                    -- Debug: List all TextButtons in CargoManager
+                                    print("Listing children of CargoManager for debugging:")
+                                    for _, child in ipairs(cargoManager:GetChildren()) do
+                                        if child:IsA("TextButton") then
+                                            print("Child: TextButton named " .. child.Name)
+                                        end
+                                    end
+                                end
+                            else
+                                warn("CargoManager not found in MenuButtons")
+                            end
+                        else
+                            warn("MenuButtons not found in PortMainMenu")
+                        end
+                    else
+                        warn("PortMainMenu not found in PortGui")
+                    end
+                else
+                    warn("PortGui not found in Guis")
                 end
+            else
+                warn("Guis not found in Storage")
             end
+        else
+            warn("Storage not found in GlobalReplicated")
         end
     else
-        warn("CargoManager not found at path: PlayerGui.PortGui.PortMainMenu.MenuButtons.CargoManager")
+        warn("GlobalReplicated not found in ReplicatedStorage")
     end
     return nil
 end
