@@ -19,7 +19,7 @@ for _, child in pairs(docking:GetChildren()) do
     end
 end
 
-wait(10)
+wait(15)
 
 -- Click CargoManager Button
 firesignal(pg.PortGui.PortMainMenu.MenuButtons.CargoManager.Button.MouseButton1Click)
@@ -38,5 +38,6 @@ wait(0.5)
 
 -- Click Undock Button
 firesignal(pg.PortGui.PortMainMenu.MenuButtons.Undock.Button.MouseButton1Click)
+
 
 
