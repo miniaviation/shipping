@@ -1,28 +1,26 @@
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+
+-- Firesignal definition
 local firesignal = firesignal or function(signal)
     if getconnections then
-        for _, conn in pairs(getconnections(signal)) do
-            if conn.Function then pcall(conn.Function) end
+        local connections = getconnections(signal)
+        if connections then
+            for _, connection in pairs(connections) do
+                if connection and connection.Function then
+                    pcall(connection.Function)
+                end
+            end
         end
     end
 end
 
-local p = game:GetService("Players").LocalPlayer
-local pg = p.PlayerGui
+-- Click CargoManager Button
+firesignal(playerGui.PortGui.PortMainMenu.MenuButtons.CargoManager.Button.MouseButton1Click)
 
--- 1. CargoManager Button
-firesignal(pg.PortGui.PortMainMenu.MenuButtons.CargoManager.Button.MouseButton1Click)
-
+-- Wait briefly
 wait(0.5)
 
--- 2. Load Button (16th child in ScrollingFrame)
-firesignal(pg.PortGui.ContainerMenu.ScrollingFrame:GetChildren()[16].Load.MouseButton1Click)
-
-wait(0.5)
-
--- 3. Back Button
-firesignal(pg.PortGui.ContainerMenu.Back.MouseButton1Click)
-
-wait(0.5)
-
--- 4. Undock Button
-firesignal(pg.PortGui.PortMainMenu.MenuButtons.Undock.Button.MouseButton1Click)
+-- Click Load Button
+firesignal(playerGui.PortGui.ContainerMenu.ScrollingFrame:GetChildren()[16].Load.MouseButton1Click)
